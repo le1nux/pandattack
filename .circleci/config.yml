@@ -45,7 +45,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            pytest --junitxml=test-reports/results.xml --cov-report xml:./test-reports/coverage.xml --cov=./src/ tests/
+            pytest --junitxml=test-reports/junit.xml --cov-report xml:./test-reports/coverage.xml --cov=./src/ tests/
             cat test-reports/coverage.xml
             codecov -f test-reports/coverage.xml
             

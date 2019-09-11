@@ -46,6 +46,7 @@ jobs:
           command: |
             . venv/bin/activate
             pytest --junitxml=test-reports/results.xml --cov=./src/ tests/
+            cat coverage.xml
             codecov
             
       - store_artifacts:

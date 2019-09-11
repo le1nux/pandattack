@@ -1,11 +1,13 @@
 # advattack
-
-[![CircleCI](https://circleci.com/gh/le1nux/advattack.svg?style=svg)](https://circleci.com/gh/le1nux/advattack)
-[![codecov](https://codecov.io/gh/le1nux/advattack/branch/master/graph/badge.svg)](https://codecov.io/gh/le1nux/advattack)
-
 Advattack (/ædvəˈtæk/) is a  framework to run and test adversarial attacks on machine learning models.
 
-In the future, this framework will provide implementations of recently published papers such as *Explaining and Harnessing Adversarial Examples* by Goodfellow et al. 
+In the future, this framework will provide implementations of recently published papers such as *Explaining and Harnessing Adversarial Examples* by Goodfellow et al.
+
+# Status
+
+Build status: [![CircleCI](https://circleci.com/gh/le1nux/advattack.svg?style=svg)](https://circleci.com/gh/le1nux/advattack)
+
+Test coverage: [![codecov](https://codecov.io/gh/le1nux/advattack/branch/master/graph/badge.svg)](https://codecov.io/gh/le1nux/advattack)
 
 # MIT License
 

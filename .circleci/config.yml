@@ -44,7 +44,9 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            pytest --junitxml=test-reports/report.xml
+            pytest --junitxml=test-reports/report.xml --cov=./tests/
+            # codecov
+            
 
       - store_artifacts:
           path: test-reports

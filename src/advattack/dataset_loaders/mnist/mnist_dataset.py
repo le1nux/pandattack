@@ -19,18 +19,8 @@ class MNISTDataset(Dataset):
         super(MNISTDataset, self).__init__(root_path, feature_transform_fun, target_transform_fun)
         self.logger = logging.getLogger("advattack.dataset_loaders.mnist.mnist_dataset.MNISTDataset")
 
-
     def __len__(self):
         return self.samples.shape[0]
-
-    def __getitem__(self, index:int):
-        """ Returns the sample and target of the dataset at given index position.
-        :param index: index within dataset
-        :return: sample, target
-        """
-#        if self.samples.shape[0] <= index:
-#            raise DatasetOutOfBoundsError("Index of {index} >= f{len(self.samples.shape[0])}")
-        return self.samples[index], self.labels[index]
 
     def visualize_samples(self, min_index, max_index):
         plots_per_column = 15 # we might want to make this configurable
@@ -41,7 +31,7 @@ class MNISTDataset(Dataset):
         plt.figure(figsize=(plots_per_column, rows))
         plt.subplots_adjust(top=0.8, bottom=0, hspace=1, wspace=0.5)
         for index in range(min_index, max_index+1):
-            ax = plt.subplot(rows, cols, index)
+            ax = plt.subplot(rows, cols, index+1)
             ax.set_axis_off()
             pixels = self.samples[index]
             label = self.labels[index]
@@ -160,11 +150,11 @@ if __name__== "__main__":
     from advattack import datasets_path
 
     path = os.path.join(datasets_path, "mnist")
-    if not MNISTDataset.check_exists(path) or True:
+    if not MNISTDataset.check_exists(path):
         path = MNISTDataset.create_dataset(root_path=datasets_path)
 
     dataset = MNISTDataset.load(path)
-    dataset.visualize_samples(min_index=1, max_index=100)
+    dataset.visualize_samples(min_index=0, max_index=5)
     len(dataset)
 
 

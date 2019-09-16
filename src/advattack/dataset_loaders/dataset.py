@@ -138,14 +138,14 @@ class Dataset(torch_dataset.Dataset):
         raise NotImplementedError()
 
     def feature_transform(self, sample):
-        if self.feature_transform is not None:
-            return self.feature_transform(sample)
+        if self.feature_transform_fun is not None:
+            return self.feature_transform_fun(sample)
         else:
             return sample
 
     def target_transform(self, target):
-        if self.target_transform is not None:
-            return self.target_transform(target)
+        if self.target_transform_fun is not None:
+            return self.target_transform_fun(target)
         else:
             return target
 
@@ -157,6 +157,4 @@ class Dataset(torch_dataset.Dataset):
         :param index: index within dataset
         :return: sample, target
         """
-        if len(self.samples) <= index:
-            raise DatasetError
-        return self.samples[index], self.labels[index]
+        return self.feature_transform(self.samples[index]), self.target_transform(self.labels[index])

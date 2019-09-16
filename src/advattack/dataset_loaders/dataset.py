@@ -41,7 +41,7 @@ class Dataset(torch_dataset.Dataset):
 
     @classmethod
     @abstractmethod
-    def load(cls, path):
+    def load(cls, path, feature_transform_fun=None, target_transform_fun=None):
         raise NotImplementedError
 
     @staticmethod

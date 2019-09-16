@@ -32,8 +32,7 @@ jobs:
             . venv/bin/activate
             pip install -r requirements.txt
             pip install codecov
-            ls ../
-            pip install -e ../src
+            pip install -e advattack/src/
 
       - save_cache:
           paths:

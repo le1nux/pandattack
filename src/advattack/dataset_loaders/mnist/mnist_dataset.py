@@ -3,26 +3,34 @@
 import torch
 import os
 from typing import List
-from advattack.error_handling.exception import DatasetError
+from advattack.error_handling.exception import DatasetOutOfBoundsError, DatasetNotFoundError
 from advattack.dataset_loaders.dataset import Dataset
 import codecs
 import numpy as np
 import logging
 import matplotlib.pyplot as plt
-from enum import Enum
 import glob
 
 class MNISTDataset(Dataset):
     """ MNIST dataset (http://yann.lecun.com/exdb/mnist/)
     """
 
-    class SubsetTags(Enum):
-        TRAIN="train"
-        TEST="test"
-
     def __init__(self, root_path, feature_transform_fun=None, target_transform_fun=None):
         super(MNISTDataset, self).__init__(root_path, feature_transform_fun, target_transform_fun)
         self.logger = logging.getLogger("advattack.dataset_loaders.mnist.mnist_dataset.MNISTDataset")
+
+
+    def __len__(self):
+        return self.samples.shape[0]
+
+    def __getitem__(self, index:int):
+        """ Returns the sample and target of the dataset at given index position.
+        :param index: index within dataset
+        :return: sample, target
+        """
+#        if self.samples.shape[0] <= index:
+#            raise DatasetOutOfBoundsError("Index of {index} >= f{len(self.samples.shape[0])}")
+        return self.samples[index], self.labels[index]
 
     def visualize_samples(self, min_index, max_index):
         plots_per_column = 15 # we might want to make this configurable
@@ -63,7 +71,7 @@ class MNISTDataset(Dataset):
         if cls.check_exists(path):
             return MNISTDataset(root_path=path)
         else:
-            raise DatasetError(expression="Not Found", message=f"Dataset not found in {path}.")
+            raise DatasetNotFoundError(f"Dataset not found in {path}.")
 
     @classmethod
     def check_exists(cls, root_path) -> bool:
@@ -157,5 +165,6 @@ if __name__== "__main__":
 
     dataset = MNISTDataset.load(path)
     dataset.visualize_samples(min_index=1, max_index=100)
+    len(dataset)
 
 

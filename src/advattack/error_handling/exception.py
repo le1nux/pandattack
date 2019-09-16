@@ -1,11 +1,7 @@
-class DatasetError(Exception):
-    """Exception raised for errors in dataset instances.
+class DatasetNotFoundError(Exception):
+    """Exception raised when a dataset could not be found."""
+    pass
 
-    Attributes:
-        expression -- input expression in which the error occurred
-        message -- explanation of the error
-    """
-
-    def __init__(self, expression, message):
-        self.expression = expression
-        self.message = message
+class DatasetOutOfBoundsError(Exception):
+    """Exception raised when an index >= len(Dataset) is used."""
+    pass

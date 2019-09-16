@@ -4,7 +4,7 @@ import torch.utils.data.dataset as torch_dataset
 import os
 from abc import abstractmethod
 from typing import List, Dict
-from advattack.error_handling.exception import DatasetError
+from advattack.error_handling.exception import DatasetNotFoundError
 import shutil
 from torchvision.datasets.utils import download_url
 import gzip
@@ -31,7 +31,7 @@ class Dataset(torch_dataset.Dataset):
         self.target_transform_fun = target_transform_fun
 
         if not self.check_exists(self.root_path):
-            raise DatasetError('Dataset not found. You can use force_download=True to download it')
+            raise DatasetNotFoundError(f'Dataset not found in {self.root_path}. You can use force_download=True to download it')
         self.samples, self.labels = self.load_data_from_disc()
 
 
@@ -150,13 +150,13 @@ class Dataset(torch_dataset.Dataset):
             return target
 
     def __len__(self):
-        return len(self.data)
+        return len(self.samples)
 
     def __getitem__(self, index:int):
         """ Returns the sample and target of the dataset at given index position.
         :param index: index within dataset
         :return: sample, target
         """
-        if len(self.data) <= index:
+        if len(self.samples) <= index:
             raise DatasetError
-        return self.data[index], self.targets[index]
+        return self.samples[index], self.labels[index]

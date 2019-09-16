@@ -1,4 +1,4 @@
-![Pandattack Logo](https://github.com/le1nux/pandattack/blob/master/logo.png | width=100)
+![Pandattack Logo](https://github.com/le1nux/pandattack/blob/master/logo.png)
 
 
 Pandattack is a  framework to run and test adversarial attacks on machine learning models.

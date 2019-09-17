@@ -1,5 +1,5 @@
-![Pandattack Logo](https://github.com/le1nux/pandattack/blob/master/logo.png)
-
+<img src="https://github.com/le1nux/pandattack/blob/master/logo.png" width="300">
+  
 --------------------------------------------------------------------------------
 
 Pandattack is a  framework to run and test adversarial attacks on machine learning models.
@@ -8,7 +8,7 @@ In the future, this framework will provide implementations of recently published
 
 # Status
 
-Build status: [![CircleCI](https://circleci.com/gh/le1nux/advattack.svg?style=svg)](https://circleci.com/gh/le1nux/advattack)
+Build status: [![CircleCI](https://circleci.com/gh/le1nux/pandattack.svg?style=svg)](https://circleci.com/gh/le1nux/pandattack)
 
 Test coverage: [![codecov](https://codecov.io/gh/le1nux/advattack/branch/master/graph/badge.svg)](https://codecov.io/gh/le1nux/advattack)
 

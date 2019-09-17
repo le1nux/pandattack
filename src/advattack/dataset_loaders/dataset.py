@@ -9,7 +9,7 @@ import shutil
 from torchvision.datasets.utils import download_url
 import gzip
 from advattack.logger import logger
-
+import random
 
 
 class Dataset(torch_dataset.Dataset):
@@ -158,3 +158,11 @@ class Dataset(torch_dataset.Dataset):
         :return: sample, target
         """
         return self.feature_transform(self.samples[index]), self.target_transform(self.labels[index])
+
+    def get_train_and_validation_set_indices(self, train_valid_split_ratio=0.8, seed=1):
+        random.seed(seed)
+        indices = list(range(len(self)))
+        random.shuffle(indices)
+        split_index = int(train_valid_split_ratio * len(indices))
+        train_indices, valid_indices = indices[:split_index], indices[split_index:]
+        return train_indices, valid_indices

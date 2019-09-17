@@ -132,7 +132,10 @@ class MNISTDataset(Dataset):
             assert cls.get_int(data[:4]) == 2049
             length = cls.get_int(data[4:8])
             parsed = np.frombuffer(data, dtype=np.uint8, offset=8)
-            return torch.from_numpy(parsed).view(length).long()
+            torch_tensor = torch.from_numpy(parsed).view(length).long()
+            torch_tensor = torch_tensor.long()
+            return torch_tensor
+
 
     @classmethod
     def read_image_file(cls, path:str):
@@ -144,14 +147,15 @@ class MNISTDataset(Dataset):
             num_rows = cls.get_int(data[8:12])
             num_cols = cls.get_int(data[12:16])
             parsed = np.frombuffer(data, dtype=np.uint8, offset=16)
-            return torch.from_numpy(parsed).view(length, num_rows, num_cols)
-
+            torch_tensor = torch.from_numpy(parsed).view(length, num_rows, num_cols)
+            torch_tensor = torch_tensor.float()
+            return torch_tensor
 
 if __name__== "__main__":
     from advattack import datasets_path
 
     path = os.path.join(datasets_path, "mnist")
-    if not MNISTDataset.check_exists(path):
+    if not MNISTDataset.check_exists(path) or True:
         path = MNISTDataset.create_dataset(root_path=datasets_path)
 
     dataset = MNISTDataset.load(path)

@@ -1,5 +1,3 @@
-![Pandattack Logo](https://github.com/le1nux/pandattack/blob/master/logo.png)
-
 <img src="https://github.com/le1nux/pandattack/blob/master/logo.png" width="400">
   
 --------------------------------------------------------------------------------

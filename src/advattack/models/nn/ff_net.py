@@ -47,13 +47,17 @@ class NNModel(nn.Module):
     def evaluate_model(self, data_loader, epoch):
         test_loss = 0
         correct = 0
+        no_samples = 0
         for samples, batch_size, targets in data_loader:
             with torch.no_grad():
                 outputs = self(samples).squeeze(1)
                 test_loss += F.nll_loss(outputs, targets, reduction='sum').item()  # sum up batch loss
                 pred = outputs.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
                 correct += pred.eq(targets.view_as(pred)).sum().item()
-        accuracy = correct / len(data_loader.dataset)
+                no_samples = no_samples + batch_size
+
+        accuracy = correct / no_samples
+        test_loss = test_loss / no_samples
         print(f'Average loss: {test_loss}, Accuracy: {accuracy}')
         return test_loss
 
@@ -126,12 +130,13 @@ if __name__ == "__main__":
     print("Device: " + str(device))
 
     num_features = 28*28
-    num_layers = 2
-    hidden_size_fc = 120
+    num_layers = 8
+    hidden_size_fc = 280
     output_size = 10
 
     batch_size = 30
-    learning_rate = 0.003
+    learning_rate = 0.1
+    epochs = 100
 
     # instantiate model
     loss_function = nn.NLLLoss()
@@ -151,5 +156,7 @@ if __name__ == "__main__":
     train_loader = DataLoader(dataset, batch_sampler=BatchSampler(sampler=SubsetRandomSampler(train_indices), batch_size=batch_size, drop_last=False), collate_fn=my_collate_fn)
     valid_loader = DataLoader(dataset, batch_sampler=BatchSampler(sampler=SubsetRandomSampler(valid_indices), batch_size=batch_size, drop_last=False), collate_fn=my_collate_fn)
 
-    model.train_model(train_loader=train_loader, valid_loader=valid_loader, optimizer=optimizer, epochs=5)
+    print(len(train_loader))
+    print(len(train_loader))
+    model.train_model(train_loader=train_loader, valid_loader=valid_loader, optimizer=optimizer, epochs=epochs)
 

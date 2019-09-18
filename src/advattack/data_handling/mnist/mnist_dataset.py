@@ -3,8 +3,8 @@
 import torch
 import os
 from typing import List
-from advattack.error_handling.exception import DatasetOutOfBoundsError, DatasetNotFoundError
-from advattack.dataset_loaders.dataset import Dataset
+from advattack.error_handling.exception import DatasetNotFoundError
+from advattack.data_handling.dataset import Dataset
 import codecs
 import numpy as np
 import logging
@@ -17,7 +17,7 @@ class MNISTDataset(Dataset):
 
     def __init__(self, root_path, feature_transform_fun=None, target_transform_fun=None):
         super(MNISTDataset, self).__init__(root_path, feature_transform_fun, target_transform_fun)
-        self.logger = logging.getLogger("advattack.dataset_loaders.mnist.mnist_dataset.MNISTDataset")
+        self.logger = logging.getLogger("advattack.data_handling.mnist.mnist_dataset.MNISTDataset")
 
     def __len__(self):
         return self.samples.shape[0]

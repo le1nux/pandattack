@@ -3,10 +3,11 @@ import torch.nn as nn
 import tqdm
 from torch.utils.tensorboard import SummaryWriter
 import os
-from torch.utils.data import DataLoader, BatchSampler, SubsetRandomSampler
+from torch.utils.data import BatchSampler, SubsetRandomSampler
 import torch.nn.functional as F
-from advattack.dataset_loaders.mnist.mnist_dataset import MNISTDataset
-from advattack import datasets_path, tensorboard_path, models_path
+from advattack.data_handling.mnist.mnist_dataset import MNISTDataset
+from advattack import datasets_path, tensorboard_path
+from advattack.data_handling.dataset_loader import DatasetLoader
 from torchvision import transforms
 
 
@@ -47,17 +48,15 @@ class NNModel(nn.Module):
     def evaluate_model(self, data_loader, epoch):
         test_loss = 0
         correct = 0
-        no_samples = 0
         for samples, batch_size, targets in data_loader:
             with torch.no_grad():
                 outputs = self(samples).squeeze(1)
                 test_loss += F.nll_loss(outputs, targets, reduction='sum').item()  # sum up batch loss
                 pred = outputs.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
                 correct += pred.eq(targets.view_as(pred)).sum().item()
-                no_samples = no_samples + batch_size
 
-        accuracy = correct / no_samples
-        test_loss = test_loss / no_samples
+        accuracy = correct / len(data_loader)
+        test_loss = test_loss / len(data_loader)
         print(f'Average loss: {test_loss}, Accuracy: {accuracy}')
         return test_loss
 
@@ -153,10 +152,8 @@ if __name__ == "__main__":
     mnist_path = os.path.join(datasets_path, "mnist")
     dataset = MNISTDataset.load(mnist_path, feature_transform_fun=feature_transform_fun)
     train_indices, valid_indices = dataset.get_train_and_validation_set_indices(train_valid_split_ratio=0.8, seed=2)
-    train_loader = DataLoader(dataset, batch_sampler=BatchSampler(sampler=SubsetRandomSampler(train_indices), batch_size=batch_size, drop_last=False), collate_fn=my_collate_fn)
-    valid_loader = DataLoader(dataset, batch_sampler=BatchSampler(sampler=SubsetRandomSampler(valid_indices), batch_size=batch_size, drop_last=False), collate_fn=my_collate_fn)
+    train_loader = DatasetLoader(dataset, batch_sampler=BatchSampler(sampler=SubsetRandomSampler(train_indices), batch_size=batch_size, drop_last=False), collate_fn=my_collate_fn)
+    valid_loader = DatasetLoader(dataset, batch_sampler=BatchSampler(sampler=SubsetRandomSampler(valid_indices), batch_size=batch_size, drop_last=False), collate_fn=my_collate_fn)
 
-    print(len(train_loader))
-    print(len(train_loader))
     model.train_model(train_loader=train_loader, valid_loader=valid_loader, optimizer=optimizer, epochs=epochs)
 

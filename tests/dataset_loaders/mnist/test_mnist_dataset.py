@@ -2,7 +2,7 @@
 import pytest
 import tempfile
 import os
-from advattack.dataset_loaders.mnist.mnist_dataset import MNISTDataset
+from advattack.data_handling.mnist.mnist_dataset import MNISTDataset
 import shutil
 from advattack.error_handling.exception import DatasetNotFoundError
 import glob

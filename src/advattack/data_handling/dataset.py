@@ -17,6 +17,7 @@ class Dataset(torch_dataset.Dataset):
 
     Every other Dataset representation has to inherit from or instantiate this class.
     """
+    # TODO: Fix this ugly hard coding ...
     logger = logger.getChild("data_handling.dataset.Dataset")
 
     def __init__(self, root_path: str, feature_transform_fun=None, target_transform_fun=None):

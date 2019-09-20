@@ -9,7 +9,7 @@ from advattack.data_handling.mnist.mnist_dataset import MNISTDataset
 from advattack import datasets_path, tensorboard_path
 from advattack.data_handling.dataset_loader import DatasetLoader
 from torchvision import transforms
-
+import numpy as np
 
 class NNModel(nn.Module):
     def __init__(self, loss_function, use_tensorboard=False):
@@ -36,7 +36,7 @@ class NNModel(nn.Module):
         print("\n=================================================================================================\n")
 
         for epoch in tqdm.tqdm(range(epochs)):  # again, normally you would NOT do 300 epochs, it is toy data
-            self.train_epoch(train_loader, loss_function, optimizer)
+            self.train_epoch(train_loader, self.loss_function, optimizer)
             print("Training loss:")
             self.evaluate_model(data_loader=train_loader, epoch=epoch)
             print("Validation loss:")
@@ -64,26 +64,18 @@ class NNModel(nn.Module):
 
 
 class FFModel(NNModel):
-    def __init__(self, input_size, num_layers, hiden_size_fc, output_size, loss_function):
+    def __init__(self, layers, loss_function):
         super(FFModel, self).__init__(loss_function)
-        self.input_size = input_size
-        self.num_layers = num_layers
-        self.hidden_size_fc = hiden_size_fc
-        self.output_size = output_size
-        # input layer
-        self.fc_layers = [nn.Linear(self.input_size, self.hidden_size_fc)]
-        # add hidden layers
-        self.fc_layers = self.fc_layers + [nn.Linear(self.hidden_size_fc, self.hidden_size_fc) for _ in range(num_layers)]
-        # output layer
-        self.out = nn.Linear(self.hidden_size_fc, output_size)
+        # create fully connected layers
+        self.fc_layers = nn.ModuleList([nn.Linear(input_size, layers[i+1]) for i, input_size in enumerate(layers[:-1])])
         self.relu = torch.nn.ReLU()
 
     def step(self, samples):
         output = self.fc_layers[0](samples)
-        for layer in self.fc_layers[1:]:
+        for layer in self.fc_layers[1:-1]:
             output = layer(output)
             output = self.relu(output)
-        output = self.out(output)
+        output = self.fc_layers[-1](output)
         output = self.relu(output)
         output = F.log_softmax(output, dim=1)
         return output
@@ -113,33 +105,18 @@ class FFModel(NNModel):
             loss.backward()
             optimizer.step()
 
-
-def my_collate_fn(batch):
-    # batch contains a list of tuples of structure (sequence, target)
-    inputs = [item[0] for item in batch]
-    inputs = torch.stack(inputs)
-    inputs = inputs.view(inputs.shape[0], -1)
-    inputs_len = inputs.shape[0]
-    targets_tensor = torch.tensor([item[1] for item in batch]).to(inputs[0].device)
-    # mapping = [item[2] for item in batch]
-    return [inputs, inputs_len, targets_tensor]
-
 if __name__ == "__main__":
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("Device: " + str(device))
-
-    num_features = 28*28
-    num_layers = 8
-    hidden_size_fc = 280
-    output_size = 10
 
     batch_size = 30
     learning_rate = 0.1
     epochs = 100
 
     # instantiate model
+    layers = np.array([28*28, 250, 250, 250, 10]).flatten()
     loss_function = nn.NLLLoss()
-    model = FFModel(input_size=num_features, num_layers=num_layers, hiden_size_fc=hidden_size_fc, output_size=output_size, loss_function=loss_function).to(device)
+    model = FFModel(layers, loss_function=loss_function).to(device)
     # optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
@@ -152,8 +129,8 @@ if __name__ == "__main__":
     mnist_path = os.path.join(datasets_path, "mnist")
     dataset = MNISTDataset.load(mnist_path, feature_transform_fun=feature_transform_fun)
     train_indices, valid_indices = dataset.get_train_and_validation_set_indices(train_valid_split_ratio=0.8, seed=2)
-    train_loader = DatasetLoader(dataset, batch_sampler=BatchSampler(sampler=SubsetRandomSampler(train_indices), batch_size=batch_size, drop_last=False), collate_fn=my_collate_fn)
-    valid_loader = DatasetLoader(dataset, batch_sampler=BatchSampler(sampler=SubsetRandomSampler(valid_indices), batch_size=batch_size, drop_last=False), collate_fn=my_collate_fn)
+    train_loader = DatasetLoader(dataset, batch_sampler=BatchSampler(sampler=SubsetRandomSampler(train_indices), batch_size=batch_size, drop_last=False))
+    valid_loader = DatasetLoader(dataset, batch_sampler=BatchSampler(sampler=SubsetRandomSampler(valid_indices), batch_size=batch_size, drop_last=False))
 
     model.train_model(train_loader=train_loader, valid_loader=valid_loader, optimizer=optimizer, epochs=epochs)
 

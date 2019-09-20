@@ -7,7 +7,7 @@ if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 
 # create logger with 'spam_application'
-logger = logging.getLogger('advattack')
+logger = logging.getLogger('')
 logger.setLevel(logging.DEBUG)
 # create file handler which logs even debug messages
 fh = logging.FileHandler(logging_path)

@@ -7,17 +7,20 @@ from advattack.error_handling.exception import DatasetNotFoundError
 from advattack.data_handling.dataset import Dataset
 import codecs
 import numpy as np
-import logging
 import matplotlib.pyplot as plt
 import glob
+from advattack.logger import logger
 
 class MNISTDataset(Dataset):
     """ MNIST dataset (http://yann.lecun.com/exdb/mnist/)
     """
 
+    # TODO: Fix this ugly hard coding ...
+    logger = logger.getChild("data_handling.dataset.mnist.mnist_dataset.MNISTDataset")
+
     def __init__(self, root_path, feature_transform_fun=None, target_transform_fun=None):
         super(MNISTDataset, self).__init__(root_path, feature_transform_fun, target_transform_fun)
-        self.logger = logging.getLogger("advattack.data_handling.mnist.mnist_dataset.MNISTDataset")
+
 
     def __len__(self):
         return self.samples.shape[0]
@@ -107,10 +110,9 @@ class MNISTDataset(Dataset):
         :param data_files:
         :return: samples, targets
         """
-
         samples_paths = sorted(glob.glob(os.path.join(self.root_path, "samples/*.pt")))
         labels_paths = sorted(glob.glob(os.path.join(self.root_path, "labels/*.pt")))
-
+        MNISTDataset.logger.debug(f"Loading samples from {samples_paths}")
         samples = [torch.load(path) for path in samples_paths]
         samples_tensor = torch.cat(samples, 0)
 

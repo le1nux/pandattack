@@ -5,3 +5,11 @@ class DatasetNotFoundError(Exception):
 class DatasetOutOfBoundsError(Exception):
     """Exception raised when an index >= len(Dataset) is used."""
     pass
+
+class AttackError(Exception):
+    """Exception raised when there was a general issue with generation an adversarial example."""
+    pass
+
+class AdversarialNotFoundError(Exception):
+    """Exception raised when an attack was not able to provide an adversarial example."""
+    pass

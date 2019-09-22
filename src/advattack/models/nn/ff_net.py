@@ -1,66 +1,14 @@
 import torch
 import torch.nn as nn
-import tqdm
-from torch.utils.tensorboard import SummaryWriter
 import os
 from torch.utils.data import BatchSampler, SubsetRandomSampler
 import torch.nn.functional as F
 from advattack.data_handling.mnist.mnist_dataset import MNISTDataset
-from advattack import datasets_path, tensorboard_path
+from advattack import datasets_path
 from advattack.data_handling.dataset_loader import DatasetLoader
+from advattack.models.nn.net import NNModel
 from torchvision import transforms
 import numpy as np
-
-class NNModel(nn.Module):
-    def __init__(self, loss_function, use_tensorboard=False):
-        super(NNModel, self).__init__()
-        self.loss_function = loss_function
-        if use_tensorboard:
-            self.tb_writer_train, self.tb_writer_valid = self.set_up_tensorboard()
-
-    def set_up_tensorboard(self):
-        # set up tensorboard
-        tb_dir_train = os.path.join(tensorboard_path, "/ff/train/")
-        tb_dir_valid = os.path.join(tensorboard_path, "/ff/valid/")
-        os.makedirs(os.path.dirname(tb_dir_train), exist_ok=True)
-        os.makedirs(os.path.dirname(tb_dir_valid), exist_ok=True)
-        tb_writer_train = SummaryWriter(log_dir=tb_dir_train, flush_secs=10)
-        tb_writer_valid = SummaryWriter(log_dir=tb_dir_valid, flush_secs=10)
-        return tb_writer_train, tb_writer_valid
-
-    def train_model(self, train_loader, valid_loader, optimizer, epochs=1):
-        print("Starting Training loss:")
-        self.evaluate_model(train_loader, 0)
-        print("Starting Validation loss:")
-        self.evaluate_model(valid_loader, 0)
-        print("\n=================================================================================================\n")
-
-        for epoch in tqdm.tqdm(range(epochs)):  # again, normally you would NOT do 300 epochs, it is toy data
-            self.train_epoch(train_loader, self.loss_function, optimizer)
-            print("Training loss:")
-            self.evaluate_model(data_loader=train_loader, epoch=epoch)
-            print("Validation loss:")
-            self.evaluate_model(data_loader=valid_loader, epoch=epoch)
-            print("\n============================================================================================\n")
-            # model_save_path = os.path.join(f'../../models/lstm_model/epoch_{epoch}.pt')
-            # model.save(model_save_path)
-
-    def evaluate_model(self, data_loader, epoch):
-        test_loss = 0
-        correct = 0
-        for samples, batch_size, targets in data_loader:
-            with torch.no_grad():
-                outputs = self(samples).squeeze(1)
-                test_loss += F.nll_loss(outputs, targets, reduction='sum').item()  # sum up batch loss
-                pred = outputs.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
-                correct += pred.eq(targets.view_as(pred)).sum().item()
-
-        accuracy = correct / len(data_loader)
-        test_loss = test_loss / len(data_loader)
-        print(f'Average loss: {test_loss}, Accuracy: {accuracy}')
-        return test_loss
-
-        #self.tb_writer.add_scalar('Loss', total_loss, epoch)
 
 
 class FFModel(NNModel):
@@ -84,11 +32,6 @@ class FFModel(NNModel):
         output = self.step(samples)
         return output
 
-    def save(self, path):
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        torch.save(self.state_dict(), path)
-        print("Model saved.")
-
     def train_epoch(self, train_loader, loss_function, optimizer):
         for samples, batch_size, targets in train_loader:
             # sequence = sequence.view(1, -1, num_features)
@@ -110,13 +53,14 @@ if __name__ == "__main__":
     print("Device: " + str(device))
 
     batch_size = 30
-    learning_rate = 0.1
-    epochs = 100
+    learning_rate = 0.001
+    epochs = 10
 
     # instantiate model
     layers = np.array([28*28, 250, 250, 250, 10]).flatten()
     loss_function = nn.NLLLoss()
     model = FFModel(layers, loss_function=loss_function).to(device)
+    print(model._type())
     # optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
@@ -133,4 +77,6 @@ if __name__ == "__main__":
     valid_loader = DatasetLoader(dataset, batch_sampler=BatchSampler(sampler=SubsetRandomSampler(valid_indices), batch_size=batch_size, drop_last=False))
 
     model.train_model(train_loader=train_loader, valid_loader=valid_loader, optimizer=optimizer, epochs=epochs)
+
+    model.save_model()
 

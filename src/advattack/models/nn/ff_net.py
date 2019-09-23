@@ -52,9 +52,9 @@ if __name__ == "__main__":
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("Device: " + str(device))
 
-    batch_size = 30
-    learning_rate = 0.001
-    epochs = 10
+    batch_size = 100
+    learning_rate = 0.0008
+    epochs = 30
 
     # instantiate model
     layers = np.array([28*28, 250, 250, 250, 10]).flatten()

@@ -21,7 +21,6 @@ class MNISTDataset(Dataset):
     def __init__(self, root_path, feature_transform_fun=None, target_transform_fun=None):
         super(MNISTDataset, self).__init__(root_path, feature_transform_fun, target_transform_fun)
 
-
     def __len__(self):
         return self.samples.shape[0]
 
@@ -59,7 +58,6 @@ class MNISTDataset(Dataset):
         }
         return resource_extraction_mapping
 
-
     @classmethod
     def load(cls, path, feature_transform_fun=None, target_transform_fun=None):
         if cls.check_exists(path):
@@ -88,7 +86,6 @@ class MNISTDataset(Dataset):
         with open(target_path, 'wb') as f:
             torch.save(data, f)
         os.remove(unzipped_path)
-
 
     @classmethod
     def extract_samples(cls, source_path):

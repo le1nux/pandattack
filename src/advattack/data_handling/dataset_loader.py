@@ -19,6 +19,7 @@ class DatasetLoader(DataLoader):
         if collate_fn is None:
             collate_fn = self.standard_collate_fn
         super(DatasetLoader, self).__init__(dataset=dataset, batch_sampler=batch_sampler, collate_fn=collate_fn)
+
     def __len__(self):
         return len(self.batch_sampler) * self.batch_sampler.batch_size
 

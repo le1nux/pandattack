@@ -91,7 +91,7 @@ if __name__ == "__main__":
     next(iterator)
     next(iterator)
     original_image, _, original_target = next(iterator)
-    attack_result = fgsm.search_for_adversarial_example(original_image, original_target, epsilon=6)
+    attack_result = fgsm.search_for_adversarial_example(original_image, original_target, epsilon=10)
     attack_result.visualize()
 
 

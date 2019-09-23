@@ -27,7 +27,7 @@ class AttackResult:
         fig = plt.figure()
         fig.add_subplot(1, 3, 1)
         plt.imshow(self.original_image, cmap='gray')
-        plt.title(f'Original\ntarget:{self.original_target}\n ln conf.:{round(self.original_confidence, 5)}')
+        plt.title(f'Original\nTarget and prediction:{self.original_target}\n ln conf.:{round(self.original_confidence, 5)}')
 
         fig.add_subplot(1, 3, 2)
         plt.imshow(self.gradient_image, cmap='gray')
@@ -35,6 +35,6 @@ class AttackResult:
 
         fig.add_subplot(1, 3, 3)
         plt.imshow(self.adversarial_image, cmap='gray')
-        plt.title(f'Adverarial Example\ntarget:{self.adversarial_target}\nln conf.:{round(self.adversarial_confidence, 5)}')
+        plt.title(f'Adversarial Example\nPrediction:{self.adversarial_target}\nln conf.:{round(self.adversarial_confidence, 5)}')
 
         plt.show()

@@ -5,12 +5,12 @@ import torch.nn.functional as F
 from advattack.error_handling.exception import AttackError, AdversarialNotFoundError
 from advattack.models.nn.ff_net import FFModel
 import torch.nn as nn
-import numpy as np
 from advattack.data_handling.mnist.mnist_dataset import MNISTDataset
 import os
 from advattack import datasets_path
 from torchvision import transforms
 from advattack.data_handling.dataset_loader import DatasetLoader
+from advattack.models.model_repository import ModelRepository
 
 
 class FGSM(Attack):
@@ -72,10 +72,8 @@ if __name__ == "__main__":
     print("Device: " + str(device))
 
     # instantiate model
-    layers = np.array([28*28, 250, 250, 250, 10]).flatten()
     loss_function = nn.NLLLoss()
-    model = FFModel(layers, loss_function=loss_function).to(device)
-    model.load_model()
+    model = ModelRepository.get_model(FFModel, MNISTDataset)
 
     # load data set
     feature_transform_fun = transforms.Compose([
@@ -88,10 +86,8 @@ if __name__ == "__main__":
 
     fgsm = FGSM(model=model)
     iterator = iter(dataset_loader)
-    next(iterator)
-    next(iterator)
     original_image, _, original_target = next(iterator)
-    attack_result = fgsm.search_for_adversarial_example(original_image, original_target, epsilon=10)
+    attack_result = fgsm.search_for_adversarial_example(original_image, original_target, epsilon=100)
     attack_result.visualize()
 
 

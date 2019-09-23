@@ -4,13 +4,14 @@ import tqdm
 from torch.utils.tensorboard import SummaryWriter
 import os
 import torch.nn.functional as F
-from advattack import tensorboard_path, models_path
+from advattack import tensorboard_path
 import shutil
+from advattack.data_handling.dataset_loader import DatasetLoader
+
 
 class NNModel(nn.Module):
-    def __init__(self, loss_function, use_tensorboard=False):
+    def __init__(self, use_tensorboard=False):
         super(NNModel, self).__init__()
-        self.loss_function = loss_function
         if use_tensorboard:
             self.tb_writer_train, self.tb_writer_valid = self.set_up_tensorboard()
 
@@ -24,7 +25,7 @@ class NNModel(nn.Module):
         tb_writer_valid = SummaryWriter(log_dir=tb_dir_valid, flush_secs=10)
         return tb_writer_train, tb_writer_valid
 
-    def train_model(self, train_loader, valid_loader, optimizer, epochs=1):
+    def train_model(self, train_loader: DatasetLoader, valid_loader: DatasetLoader, optimizer, loss_function, epochs=1):
         print("Starting Training loss:")
         self.evaluate_model(train_loader, 0)
         print("Starting Validation loss:")
@@ -32,7 +33,7 @@ class NNModel(nn.Module):
         print("\n=================================================================================================\n")
 
         for epoch in tqdm.tqdm(range(epochs)):  # again, normally you would NOT do 300 epochs, it is toy data
-            self.train_epoch(train_loader, self.loss_function, optimizer)
+            self.train_epoch(train_loader, loss_function, optimizer)
             print("Training loss:")
             self.evaluate_model(data_loader=train_loader, epoch=epoch)
             print("Validation loss:")
@@ -56,17 +57,22 @@ class NNModel(nn.Module):
         print(f'Average loss: {test_loss}, Accuracy: {accuracy}')
         return test_loss
 
-    def save_model(self):
-        folder = os.path.join(models_path, self._type())
-        shutil.rmtree(folder, ignore_errors=True)
-        os.makedirs(folder)
-        full_path = os.path.join(folder, "model.pt")
+    def save_model(self, folder_path) -> str:
+        shutil.rmtree(folder_path, ignore_errors=True)
+        os.makedirs(folder_path)
+        full_path = os.path.join(folder_path, "model.pt")
         torch.save(self.state_dict(), full_path)
+        return full_path
 
-    def load_model(self):
-        full_path = os.path.join(models_path, self._type(), "model.pt")
+    def load_model(self, folder_path):
+        full_path = os.path.join(folder_path, "model.pt")
         self.load_state_dict(torch.load(full_path))
         self.eval()
 
-    def _type(self):
-        return self.__class__.__name__
+    @classmethod
+    def get_model_type(cls):
+        return cls.__mro__[0].__name__
+
+
+    def get_config(self):
+        return dict()

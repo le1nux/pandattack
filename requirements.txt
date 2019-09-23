@@ -3,3 +3,4 @@ pytest-cov
 torch 
 torchvision
 matplotlib
+tqdm

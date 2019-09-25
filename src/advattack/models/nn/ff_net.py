@@ -3,10 +3,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 from advattack.models.nn.net import NNModel
 from typing import List
+from torch.utils.tensorboard import SummaryWriter
+
 
 class FFModel(NNModel):
-    def __init__(self, layers:List[int]):
-        super(FFModel, self).__init__()
+    def __init__(self, layers:List[int], tensorboard_writer:SummaryWriter):
+        super(FFModel, self).__init__(tensorboard_writer=tensorboard_writer)
         self.layers = layers
         # create fully connected layers
         self.fc_layers = nn.ModuleList([nn.Linear(input_size, layers[i+1]) for i, input_size in enumerate(layers[:-1])])

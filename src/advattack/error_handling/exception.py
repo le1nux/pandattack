@@ -13,3 +13,7 @@ class AttackError(Exception):
 class AdversarialNotFoundError(Exception):
     """Exception raised when an attack was not able to provide an adversarial example."""
     pass
+
+class ModelNotTrainedError(Exception):
+    """Exception raised when model state is requested that is training dependent"""
+    pass

@@ -7,7 +7,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 
 class FFModel(NNModel):
-    def __init__(self, layers:List[int], tensorboard_writer:SummaryWriter):
+    def __init__(self, layers:List[int], tensorboard_writer: SummaryWriter = None):
         super(FFModel, self).__init__(tensorboard_writer=tensorboard_writer)
         self.layers = layers
         # create fully connected layers

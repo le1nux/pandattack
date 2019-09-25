@@ -9,7 +9,7 @@ import codecs
 import numpy as np
 import matplotlib.pyplot as plt
 import glob
-from advattack.logger import logger
+from advattack.util.logger import logger
 
 class MNISTDataset(Dataset):
     """ MNIST dataset (http://yann.lecun.com/exdb/mnist/)

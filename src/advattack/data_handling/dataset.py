@@ -8,8 +8,11 @@ from advattack.error_handling.exception import DatasetNotFoundError
 import shutil
 from torchvision.datasets.utils import download_url
 import gzip
-from advattack.logger import logger
+from advattack.util.logger import logger
 import random
+from typing import TypeVar, Type
+
+T = TypeVar('T', bound='Dataset')
 
 
 class Dataset(torch_dataset.Dataset):
@@ -35,6 +38,9 @@ class Dataset(torch_dataset.Dataset):
             raise DatasetNotFoundError(f'Dataset not found in {self.root_path}. You can use force_download=True to download it')
         self.samples, self.labels = self.load_data_from_disc()
 
+    @classmethod
+    def get_dataset_identifier(cls):
+        return cls.__mro__[0].__name__
 
     @abstractmethod
     def visualize_samples(self, min_index, max_index):
@@ -42,7 +48,7 @@ class Dataset(torch_dataset.Dataset):
 
     @classmethod
     @abstractmethod
-    def load(cls, path, feature_transform_fun=None, target_transform_fun=None):
+    def load(cls: Type[T], path, feature_transform_fun=None, target_transform_fun=None) -> T:
         raise NotImplementedError
 
     @staticmethod

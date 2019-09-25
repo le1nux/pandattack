@@ -1,29 +1,17 @@
 import torch
 import torch.nn as nn
 import tqdm
-from torch.utils.tensorboard import SummaryWriter
 import os
 import torch.nn.functional as F
-from advattack import tensorboard_path
 import shutil
 from advattack.data_handling.dataset_loader import DatasetLoader
+from torch.utils.tensorboard import SummaryWriter
 
 
 class NNModel(nn.Module):
-    def __init__(self, use_tensorboard=False):
+    def __init__(self, tensorboard_writer: SummaryWriter):
         super(NNModel, self).__init__()
-        if use_tensorboard:
-            self.tb_writer_train, self.tb_writer_valid = self.set_up_tensorboard()
-
-    def set_up_tensorboard(self):
-        # set up tensorboard
-        tb_dir_train = os.path.join(tensorboard_path, "/ff/train/")
-        tb_dir_valid = os.path.join(tensorboard_path, "/ff/valid/")
-        os.makedirs(os.path.dirname(tb_dir_train), exist_ok=True)
-        os.makedirs(os.path.dirname(tb_dir_valid), exist_ok=True)
-        tb_writer_train = SummaryWriter(log_dir=tb_dir_train, flush_secs=10)
-        tb_writer_valid = SummaryWriter(log_dir=tb_dir_valid, flush_secs=10)
-        return tb_writer_train, tb_writer_valid
+        self.tensorboard_writer = tensorboard_writer
 
     def train_model(self, train_loader: DatasetLoader, valid_loader: DatasetLoader, optimizer, loss_function, epochs=1):
         print("Starting Training loss:")
@@ -42,7 +30,7 @@ class NNModel(nn.Module):
             # model_save_path = os.path.join(f'../../models/lstm_model/epoch_{epoch}.pt')
             # model.save(model_save_path)
 
-    def evaluate_model(self, data_loader, epoch):
+    def evaluate_model(self, data_loader: DatasetLoader, epoch):
         test_loss = 0
         correct = 0
         for samples, batch_size, targets in data_loader:
@@ -70,9 +58,8 @@ class NNModel(nn.Module):
         self.eval()
 
     @classmethod
-    def get_model_type(cls):
+    def get_model_identifier(cls):
         return cls.__mro__[0].__name__
-
 
     def get_config(self):
         return dict()

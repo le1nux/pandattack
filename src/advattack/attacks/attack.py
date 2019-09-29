@@ -5,7 +5,7 @@ import numpy as np
 
 
 class Attack:
-    def __init__(self, model:NNModel, device):
+    def __init__(self, model: NNModel, device):
         self.model = model
         self.device = device
 

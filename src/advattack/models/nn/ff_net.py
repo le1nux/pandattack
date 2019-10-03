@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from advattack.models.nn.net import NNModel
@@ -7,20 +6,17 @@ from torch.utils.tensorboard import SummaryWriter
 
 
 class FFModel(NNModel):
-    def __init__(self, layers: List[int], tensorboard_writer: SummaryWriter = None):
-        super(FFModel, self).__init__(tensorboard_writer=tensorboard_writer)
-        self.layers = layers
+    def __init__(self, layer_config: List[int], tensorboard_writer: SummaryWriter = None, seed: int = None):
+        super(FFModel, self).__init__(tensorboard_writer=tensorboard_writer, seed=seed)
+        self.layer_config = layer_config
         # create fully connected layers
-        self.fc_layers = nn.ModuleList([nn.Linear(input_size, layers[i+1]) for i, input_size in enumerate(layers[:-1])])
-        self.relu = torch.nn.ReLU()
+        self.fc_layers = nn.ModuleList([nn.Linear(input_size, layer_config[i + 1]) for i, input_size in enumerate(layer_config[:-1])])
 
     def step(self, samples):
-        output = self.fc_layers[0](samples)
-        for layer in self.fc_layers[1:-1]:
+        output = samples
+        for layer in self.fc_layers:
             output = layer(output)
-            output = self.relu(output)
-        output = self.fc_layers[-1](output)
-        output = self.relu(output)
+            output = F.relu(output)
         output = F.log_softmax(output, dim=1)
         return output
 
@@ -46,7 +42,7 @@ class FFModel(NNModel):
 
     def get_config(self):
         config = super().get_config()
-        config["layers"] = self.layers
+        config["layers"] = self.layer_config
         return config
 
 

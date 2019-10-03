@@ -9,9 +9,11 @@ from torch.utils.tensorboard import SummaryWriter
 
 
 class NNModel(nn.Module):
-    def __init__(self, tensorboard_writer: SummaryWriter):
+    def __init__(self, tensorboard_writer: SummaryWriter, seed: int = None):
         super(NNModel, self).__init__()
         self.tensorboard_writer = tensorboard_writer
+        if seed is not None:
+            torch.manual_seed(seed)
 
     def train_model(self, train_loader: DatasetLoader, valid_loader: DatasetLoader, optimizer, loss_function, epochs=1):
         print("Starting Training loss:")

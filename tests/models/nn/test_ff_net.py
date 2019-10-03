@@ -53,7 +53,7 @@ class TestFFModel:
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         print("Device: " + str(device))
 
-        model_config = {"layers": np.array([28 * 28, 250, 250, 250, 10]).flatten().tolist()}
+        model_config = {"layer_config": np.array([28 * 28, 250, 250, 250, 10]).flatten().tolist()}
 
         # instantiate model
         model = FFModel(**model_config).to(device)

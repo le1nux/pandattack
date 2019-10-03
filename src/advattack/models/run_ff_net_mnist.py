@@ -25,7 +25,7 @@ model_class = FFModel
 
 # instantiate model
 tensorboard_writer = TensorboardWrapper.get_summary_writer(dataset_identifier=dataset_class.get_dataset_identifier(), model_identifier=model_class.get_model_identifier(), mode=TensorboardMode.TRAIN)
-model_config = {"layers": np.array([28 * 28, 250, 250, 250, 10],).flatten().tolist(),
+model_config = {"layer_config": np.array([28 * 28, 250, 250, 250, 10],).flatten().tolist(),
                 "tensorboard_writer": tensorboard_writer
                 }
 

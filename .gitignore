@@ -104,3 +104,9 @@ venv.bak/
 .mypy_cache/
 
 *.whl
+
+datasets/
+.idea/
+models/
+tensorboard/
+logs/

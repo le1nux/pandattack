@@ -8,7 +8,7 @@ import torch
 class TestFGSM:
     @pytest.fixture
     def model(self):
-        model = FFModel(layers=[16, 5, 5])
+        model = FFModel(layer_config=[16, 5, 5])
         yield model
 
     @pytest.fixture

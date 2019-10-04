@@ -53,3 +53,8 @@ class ConvNet(NNModel):
             loss = loss_function(predictions, targets)
             loss.backward()
             optimizer.step()
+
+    def get_config(self):
+        config = super().get_config()
+        config["layer_config"] = self.layer_config
+        return config

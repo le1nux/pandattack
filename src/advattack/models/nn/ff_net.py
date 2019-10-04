@@ -42,7 +42,7 @@ class FFNet(NNModel):
 
     def get_config(self):
         config = super().get_config()
-        config["layers"] = self.layer_config
+        config["layer_config"] = self.layer_config
         return config
 
 

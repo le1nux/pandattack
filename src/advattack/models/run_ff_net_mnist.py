@@ -18,7 +18,7 @@ print("Device: " + str(device))
 
 batch_size = 100
 learning_rate = 0.001
-epochs = 150
+epochs = 20
 
 dataset_class = MNISTDataset
 model_class = FFNet

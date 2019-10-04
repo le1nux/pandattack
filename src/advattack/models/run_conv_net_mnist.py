@@ -70,7 +70,7 @@ valid_loader = DatasetLoader(dataset, batch_sampler=BatchSampler(sampler=SubsetR
 model.train_model(train_loader=train_loader, valid_loader=valid_loader, optimizer=optimizer, loss_function=loss_function, epochs=epochs)
 
 # save model to disk
-ModelRepository(model=model, dataset_class=dataset_class)
+ModelRepository.store_model(model=model, dataset_class=dataset_class)
 
 # load model from disk
 model = ModelRepository.get_model(model_class, dataset_class=dataset_class)

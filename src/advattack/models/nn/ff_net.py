@@ -5,9 +5,9 @@ from typing import List
 from torch.utils.tensorboard import SummaryWriter
 
 
-class FFModel(NNModel):
+class FFNet(NNModel):
     def __init__(self, layer_config: List[int], tensorboard_writer: SummaryWriter = None, seed: int = None):
-        super(FFModel, self).__init__(tensorboard_writer=tensorboard_writer, seed=seed)
+        super(FFNet, self).__init__(tensorboard_writer=tensorboard_writer, seed=seed)
         self.layer_config = layer_config
         # create fully connected layers
         self.fc_layers = nn.ModuleList([nn.Linear(input_size, layer_config[i + 1]) for i, input_size in enumerate(layer_config[:-1])])

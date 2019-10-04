@@ -5,7 +5,7 @@ from torch.utils.data import BatchSampler, SubsetRandomSampler
 from advattack.data_handling.mnist.mnist_dataset import MNISTDataset
 from advattack import datasets_path
 from advattack.data_handling.dataset_loader import DatasetLoader
-from advattack.models.nn.ff_net import FFModel
+from advattack.models.nn.ff_net import FFNet
 from advattack.models.model_repository import ModelRepository
 from torchvision import transforms
 import numpy as np
@@ -21,13 +21,13 @@ learning_rate = 0.001
 epochs = 150
 
 dataset_class = MNISTDataset
-model_class = FFModel
+model_class = FFNet
 
 # instantiate model
 tensorboard_writer = TensorboardWrapper.get_summary_writer(dataset_identifier=dataset_class.get_dataset_identifier(), model_identifier=model_class.get_model_identifier(), mode=TensorboardMode.TRAIN)
 model_config = {"layer_config": np.array([28 * 28, 250, 250, 250, 10],).flatten().tolist(),
                 "tensorboard_writer": tensorboard_writer
-                }
+}
 
 loss_function = nn.NLLLoss()
 model = model_class(**model_config).to(device)

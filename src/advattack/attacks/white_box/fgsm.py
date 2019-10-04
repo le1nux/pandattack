@@ -3,7 +3,7 @@ from advattack.models.nn.net import NNModel
 import torch
 import torch.nn.functional as F
 from advattack.error_handling.exception import AttackError, AdversarialNotFoundError
-from advattack.models.nn.ff_net import FFModel
+from advattack.models.nn.ff_net import FFNet
 import torch.nn as nn
 from advattack.data_handling.mnist.mnist_dataset import MNISTDataset
 import os
@@ -74,7 +74,7 @@ if __name__ == "__main__":
 
     # instantiate model
     loss_function = nn.NLLLoss()
-    model = ModelRepository.get_model(FFModel, MNISTDataset)
+    model = ModelRepository.get_model(FFNet, MNISTDataset)
 
     # load data set
     feature_transform_fun = transforms.Compose([

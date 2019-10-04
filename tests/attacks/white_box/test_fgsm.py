@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 import pytest
 from advattack.attacks.white_box.fgsm import FGSM
-from advattack.models.nn.ff_net import FFModel
+from advattack.models.nn.ff_net import FFNet
 import torch
 
 
 class TestFGSM:
     @pytest.fixture
     def model(self):
-        model = FFModel(layer_config=[16, 5, 5])
+        model = FFNet(layer_config=[16, 5, 5])
         yield model
 
     @pytest.fixture

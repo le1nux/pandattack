@@ -105,8 +105,8 @@ venv.bak/
 
 *.whl
 
-datasets/
+/datasets/
 .idea/
-models/
-tensorboard/
-logs/
+/models/
+/tensorboard/
+/logs/

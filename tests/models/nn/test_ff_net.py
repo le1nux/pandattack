@@ -2,7 +2,7 @@
 import pytest
 import tempfile
 import shutil
-from advattack.models.nn.ff_net import  FFModel
+from advattack.models.nn.ff_net import FFNet
 import torch
 import torch.nn as nn
 from torch.utils.data import BatchSampler, SubsetRandomSampler
@@ -56,7 +56,7 @@ class TestFFModel:
         model_config = {"layer_config": np.array([28 * 28, 250, 250, 250, 10]).flatten().tolist()}
 
         # instantiate model
-        model = FFModel(**model_config).to(device)
+        model = FFNet(**model_config).to(device)
         yield model
 
     def test_train_model(self, train_valid_loader, ff_net_model):

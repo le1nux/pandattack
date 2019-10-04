@@ -17,11 +17,13 @@ class Attack:
 class AttackResult:
     def __init__(self, original_image, original_target, original_confidence, adversarial_image, adversarial_target, adversarial_confidence, gradient_image):
         # TODO we need a custom reshape function here, that is passed as an argument to the function
-        shape = np.sqrt(original_image[0].size()).astype(np.int32).repeat(2)
-        self.original_image = original_image.view(*shape)
+        original_image_flat = original_image.view(-1)
+        adversarial_image_flat = adversarial_image.view(-1)
+        shape = np.sqrt(original_image_flat.size()).astype(np.int32).repeat(2)
+        self.original_image = original_image_flat.view(*shape)
         self.original_target = int(original_target)
         self.original_confidence = np.e**float(original_confidence)
-        self.adversarial_image = adversarial_image.view(*shape)
+        self.adversarial_image = adversarial_image_flat.view(*shape)
         self.adversarial_target = int(adversarial_target)
         self.adversarial_confidence = np.e**float(adversarial_confidence)
         self.gradient_image = gradient_image.view(*shape)

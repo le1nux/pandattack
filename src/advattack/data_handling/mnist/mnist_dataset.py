@@ -72,10 +72,9 @@ class MNISTDataset(Dataset):
 
     @classmethod
     def create_dataset(cls, root_path) -> str:
-        dataset_path = os.path.join(root_path, "mnist")
         resource_extraction_mapping = cls.get_config()
-        cls.populate_data_repository(dataset_path, resource_extraction_mapping, force_download=True)
-        return dataset_path
+        cls.populate_data_repository(root_path, resource_extraction_mapping, force_download=True)
+        return root_path
 
     @classmethod
     def extract_labels(cls, source_path):

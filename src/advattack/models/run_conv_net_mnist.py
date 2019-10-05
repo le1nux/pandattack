@@ -1,9 +1,8 @@
 import torch
 import torch.nn as nn
-import os
 from torch.utils.data import BatchSampler, SubsetRandomSampler
+from advattack.data_handling.dataset_repository import DatasetRepository
 from advattack.data_handling.mnist.mnist_dataset import MNISTDataset
-from advattack import datasets_path
 from advattack.data_handling.dataset_loader import DatasetLoader
 from advattack.models.nn.conv_net import ConvNet
 from advattack.models.model_repository import ModelRepository
@@ -54,8 +53,7 @@ feature_transform_fun = transforms.Compose([
 ])
 
 # load dataset
-mnist_path = os.path.join(datasets_path, "mnist")
-dataset = dataset_class.load(mnist_path, feature_transform_fun=feature_transform_fun)
+dataset = DatasetRepository.get_dataset(dataset_class, feature_transform_fun=feature_transform_fun)
 train_indices, valid_indices = dataset.get_train_and_validation_set_indices(train_valid_split_ratio=0.8, seed=2)
 train_loader = DatasetLoader(dataset,
                              batch_sampler=BatchSampler(sampler=SubsetRandomSampler(train_indices),

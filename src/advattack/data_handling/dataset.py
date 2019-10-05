@@ -35,7 +35,7 @@ class Dataset(torch_dataset.Dataset):
         self.target_transform_fun = target_transform_fun
 
         if not self.check_exists(self.root_path):
-            raise DatasetNotFoundError(f'Dataset not found in {self.root_path}. You can use force_download=True to download it')
+            raise DatasetNotFoundError(f'Dataset not found in {self.root_path}. You can use Dataset.create_dataset(...) to download it')
         self.samples, self.labels = self.load_data_from_disc()
 
     @classmethod

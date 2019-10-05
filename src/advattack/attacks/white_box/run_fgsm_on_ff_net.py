@@ -3,8 +3,7 @@ from advattack.error_handling.exception import AttackError, AdversarialNotFoundE
 from advattack.models.nn.ff_net import FFNet
 import torch.nn as nn
 from advattack.data_handling.mnist.mnist_dataset import MNISTDataset
-import os
-from advattack import datasets_path
+from advattack.data_handling.dataset_repository import DatasetRepository
 from torchvision import transforms
 from advattack.data_handling.dataset_loader import DatasetLoader
 from advattack.models.model_repository import ModelRepository
@@ -22,8 +21,8 @@ feature_transform_fun = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize((0.1307,), (0.3081,))
 ])
-mnist_path = os.path.join(datasets_path, "mnist")
-dataset = MNISTDataset.load(mnist_path, feature_transform_fun=feature_transform_fun)
+dataset_class = MNISTDataset
+dataset = DatasetRepository.get_dataset(dataset_class, feature_transform_fun=feature_transform_fun)
 dataset_loader = DatasetLoader(dataset)
 
 fgsm = FGSM(model=model, epsilon=1, device=device)

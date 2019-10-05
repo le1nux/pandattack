@@ -24,7 +24,6 @@ class TestConvNet:
     def mnist_dataset_path(self, tmp_dir):
         dataset_path = MNISTDataset.create_dataset(root_path=tmp_dir)
         yield dataset_path
-        shutil.rmtree(dataset_path)
 
     @pytest.fixture
     def mnist_dataset(self, mnist_dataset_path):

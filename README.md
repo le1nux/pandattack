@@ -10,7 +10,7 @@ In the future, this framework will provide implementations of recently published
 
 Build status: [![CircleCI](https://circleci.com/gh/le1nux/pandattack.svg?style=svg)](https://circleci.com/gh/le1nux/pandattack)
 
-Test coverage: [![codecov](https://codecov.io/gh/le1nux/advattack/branch/master/graph/badge.svg)](https://codecov.io/gh/le1nux/advattack)
+Test coverage: [![codecov](https://codecov.io/gh/le1nux/pandattack/branch/master/graph/badge.svg)](https://codecov.io/gh/le1nux/pandattack)
 
 # MIT License
 

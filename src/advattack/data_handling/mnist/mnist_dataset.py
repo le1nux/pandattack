@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import glob
 from advattack.util.logger import logger
 
+
 class MNISTDataset(Dataset):
     """ MNIST dataset (http://yann.lecun.com/exdb/mnist/)
     """
@@ -94,10 +95,6 @@ class MNISTDataset(Dataset):
         data = MNISTDataset.read_image_file(unzipped_path)
         with open(target_path, 'wb') as f:
             torch.save(data, f)
-        os.remove(unzipped_path)
-
-    def save(self, path):
-        pass
 
     def load_data_from_disc(self) -> (List, List):
         """Method that implements loading functionality of an on disk dataset.

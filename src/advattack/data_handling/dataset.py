@@ -132,10 +132,6 @@ class Dataset(torch_dataset.Dataset):
     #######################################################################################################
 
     @abstractmethod
-    def save(self, path):
-        raise NotImplementedError()
-
-    @abstractmethod
     def load_data_from_disc(self) -> (List, List):
         """ Method that implements loading functionality of an on disk dataset.
 

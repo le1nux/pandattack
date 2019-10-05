@@ -6,7 +6,7 @@ import shutil
 from advattack.data_handling.dataset_loader import DatasetLoader
 from torch.utils.data import BatchSampler, SubsetRandomSampler
 
-class TestMNISTDataset:
+class TestDatasetLoader:
 
     @pytest.fixture
     def tmp_dir(self):
@@ -18,7 +18,6 @@ class TestMNISTDataset:
     def mnist_dataset_path(self, tmp_dir):
         dataset_path = MNISTDataset.create_dataset(root_path=tmp_dir)
         yield dataset_path
-        shutil.rmtree(dataset_path)
 
     @pytest.fixture
     def mnist_dataset(self, mnist_dataset_path):

@@ -17,3 +17,8 @@ class AdversarialNotFoundError(Exception):
 class ModelNotTrainedError(Exception):
     """Exception raised when model state is requested that is training dependent"""
     pass
+
+
+class DatasetFileCorruptError(Exception):
+    """Thrown when integrity checks indicate that a given file is corrupt."""
+    pass

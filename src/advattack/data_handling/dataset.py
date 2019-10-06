@@ -4,13 +4,14 @@ import torch.utils.data.dataset as torch_dataset
 import os
 from abc import abstractmethod
 from typing import List, Dict
-from advattack.error_handling.exception import DatasetNotFoundError
+from advattack.error_handling.exception import DatasetNotFoundError, DatasetFileCorruptError
 import shutil
 from torchvision.datasets.utils import download_url
 import gzip
 from advattack.util.logger import logger
 import random
 from typing import TypeVar, Type
+import hashlib
 
 T = TypeVar('T', bound='Dataset')
 
@@ -43,16 +44,16 @@ class Dataset(torch_dataset.Dataset):
         return cls.__mro__[0].__name__
 
     @abstractmethod
-    def visualize_samples(self, min_index, max_index):
+    def visualize_samples(self, min_index: int, max_index: int):
         raise NotImplementedError
 
     @classmethod
     @abstractmethod
-    def load(cls: Type[T], path, feature_transform_fun=None, target_transform_fun=None) -> T:
+    def load(cls: Type[T], path: str, feature_transform_fun=None, target_transform_fun=None) -> T:
         raise NotImplementedError
 
     @staticmethod
-    def extract_gzip(gzip_path, remove_finished=False):
+    def extract_gzip(gzip_path: str, remove_finished=False):
         destination_path = gzip_path.replace('.gz', '')
         print('Extracting {}'.format(gzip_path))
         with open(destination_path, 'wb') as out_f, \
@@ -64,34 +65,34 @@ class Dataset(torch_dataset.Dataset):
 
     @classmethod
     @abstractmethod
-    def check_exists(cls, root_path) -> bool:
+    def check_exists(cls, root_path: str) -> bool:
         raise NotImplementedError
 
     ###########################  DATASET DOWNLOAD AND EXTRACTION FUNCTIONS ##################################
 
     @classmethod
     @abstractmethod
-    def create_dataset(cls, root_path) -> str:
+    def create_dataset(cls, root_path: str) -> str:
         raise NotImplementedError
 
 
     @classmethod
-    def populate_data_repository(cls, root_path, dataset_sources:Dict, force_download=False):
+    def populate_data_repository(cls, root_path: str, dataset_sources:Dict, force_download=False):
         if force_download or not cls.check_exists(root_path):
             # delete old repository if it exists
             cls.empty_repository(root_path=root_path)
             dataset_dirs = dataset_sources.copy()
-            for source, (directory, extraction_func) in dataset_dirs.items():
+            for source, (md5, directory, extraction_func) in dataset_dirs.items():
                 # download and extract files
                 download_directory = os.path.join(root_path, directory)
-                downloaded_file_path = cls.download_dataset_file(url=source, path=download_directory)
+                downloaded_file_path = cls.download_dataset_file(url=source, path=download_directory, md5=md5)
                 cls.extract_dataset_file(source_path=downloaded_file_path, extraction_fun=extraction_func)
         else:
             cls.logger.warn(f"Repository already exists in {root_path} and donwload not enforced.")
 
 
     @classmethod
-    def empty_repository(cls, root_path):
+    def empty_repository(cls, root_path: str):
         cls.logger.info(f"Deleting current repository {root_path} ...")
         # remove possibly existing dataset
         shutil.rmtree(root_path, ignore_errors=True)
@@ -99,7 +100,7 @@ class Dataset(torch_dataset.Dataset):
         os.makedirs(root_path)
 
     @classmethod
-    def download_dataset_file(cls, path, url) -> str:
+    def download_dataset_file(cls, path: str, url: str, md5: str) -> str:
         """ Downloads the dataset given by the url.
         :param path: path to the root of the data repository
         :param url: URL to the dataset
@@ -110,11 +111,30 @@ class Dataset(torch_dataset.Dataset):
         filename = url.rpartition('/')[2]
         download_url(url, root=path, filename=filename)
         file_path = os.path.join(path, filename)
+        if not Dataset.check_md5(file_path=file_path, md5=md5):
+            cls.logger.warn(f"Given MD5 hash did not match with the md5 has of file {file_path}")
+            raise DatasetFileCorruptError
         cls.logger.info("Done.")
         return file_path
 
+    @staticmethod
+    def calculate_md5(file_path: str, chunk_size: int = 1024 * 1024):
+        md5 = hashlib.md5()
+        with open(file_path, 'rb') as f:
+            for chunk in iter(lambda: f.read(chunk_size), b''):
+                md5.update(chunk)
+        return md5.hexdigest()
+
+    @staticmethod
+    def check_md5(file_path: str, md5: str):
+        if not os.path.isfile(file_path):
+            Dataset.logger.warn(f"File {file_path} not found!")
+            return False
+        file_md5 = Dataset.calculate_md5(file_path)
+        return file_md5 == md5
+
     @classmethod
-    def extract_dataset_file(cls, source_path, extraction_fun):
+    def extract_dataset_file(cls, source_path: str, extraction_fun):
         """ The extraction function passed as a function argument must only take the dataset file path as input.
         All extraction parameters therefore already have to be present within the extraction function.
         A good approach is to wrap the respective extraction function implemented in this class
@@ -156,7 +176,7 @@ class Dataset(torch_dataset.Dataset):
     def __len__(self):
         return len(self.samples)
 
-    def __getitem__(self, index:int):
+    def __getitem__(self, index: int):
         """ Returns the sample and target of the dataset at given index position.
         :param index: index within dataset
         :return: sample, target

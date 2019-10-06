@@ -30,34 +30,30 @@ class MNISTDataset(Dataset):
         plot_count = max_index - min_index + 1
         cols = min(plot_count, plots_per_column)
         rows = int(plot_count/plots_per_column) + 1
-        index = min_index
         plt.figure(figsize=(plots_per_column, rows))
         plt.subplots_adjust(top=0.8, bottom=0, hspace=1, wspace=0.5)
         for fig_index, index in enumerate(range(min_index, max_index+1)):
             ax = plt.subplot(rows, cols, fig_index+1)
             ax.set_axis_off()
             pixels, label = self[index]
-            # pixels = self.samples[index]
-            # label = self.labels[index]
             plt.title(f'idx:{index}\nlbl:{label}')
             plt.imshow(pixels, cmap='gray')
-        #plt.tight_layout()
         plt.show()
 
     @classmethod
     def get_config(cls):
         # URL: (download_path, final_file_name, extraction_function)
-        resource_extraction_mapping = {
+        resources = {
             'http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz': (
-                "samples/", MNISTDataset.extract_samples),
+                "f68b3c2dcbeaaa9fbdd348bbdeb94873", "samples/", MNISTDataset.extract_samples),
             'http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz': (
-                "labels/", MNISTDataset.extract_labels),
+                "d53e105ee54ea40749a09fcbcd1e9432", "labels/", MNISTDataset.extract_labels),
             'http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz': (
-                "samples/", MNISTDataset.extract_samples),
+                "9fb629c4189551a2d022fa330f9573f3", "samples/", MNISTDataset.extract_samples),
             'http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz': (
-                "labels/", MNISTDataset.extract_labels)
+                "ec29112dd5afa0611ce80d1b7f02629c", "labels/", MNISTDataset.extract_labels)
         }
-        return resource_extraction_mapping
+        return resources
 
     @classmethod
     def load(cls, path, feature_transform_fun=None, target_transform_fun=None):
@@ -73,8 +69,8 @@ class MNISTDataset(Dataset):
 
     @classmethod
     def create_dataset(cls, root_path) -> str:
-        resource_extraction_mapping = cls.get_config()
-        cls.populate_data_repository(root_path, resource_extraction_mapping, force_download=True)
+        resources = cls.get_config()
+        cls.populate_data_repository(root_path, resources, force_download=True)
         return root_path
 
     @classmethod

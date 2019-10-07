@@ -12,6 +12,7 @@ from advattack.util.logger import logger
 import random
 from typing import TypeVar, Type
 import hashlib
+import tarfile
 
 T = TypeVar('T', bound='Dataset')
 
@@ -37,7 +38,7 @@ class Dataset(torch_dataset.Dataset):
 
         if not self.check_exists(self.root_path):
             raise DatasetNotFoundError(f'Dataset not found in {self.root_path}. You can use Dataset.create_dataset(...) to download it')
-        self.samples, self.labels = self.load_data_from_disc()
+        self.samples, self.labels, self.label_map = self.load_data_from_disc()
 
     @classmethod
     def get_dataset_identifier(cls):
@@ -62,6 +63,17 @@ class Dataset(torch_dataset.Dataset):
         if remove_finished:
             os.unlink(gzip_path)
         return destination_path
+
+    @staticmethod
+    def extract_tar(archive_path: str, remove_finished=False):
+        if archive_path.endswith(".tar.gz"):
+            with tarfile.open(archive_path, 'r:gz') as tar:
+                tar.extractall(os.path.dirname(archive_path))
+        elif archive_path.endswith(".tar"):
+            with tarfile.open(archive_path, 'r') as tar:
+                tar.extractall(os.path.dirname(archive_path))
+        if remove_finished:
+            os.unlink(archive_path)
 
     @classmethod
     @abstractmethod
@@ -114,6 +126,9 @@ class Dataset(torch_dataset.Dataset):
         if not Dataset.check_md5(file_path=file_path, md5=md5):
             cls.logger.warn(f"Given MD5 hash did not match with the md5 has of file {file_path}")
             raise DatasetFileCorruptError
+        else:
+            cls.logger.debug(f"Hash of file {file_path} is correct.")
+
         cls.logger.info("Done.")
         return file_path
 
@@ -152,7 +167,7 @@ class Dataset(torch_dataset.Dataset):
     #######################################################################################################
 
     @abstractmethod
-    def load_data_from_disc(self) -> (List, List):
+    def load_data_from_disc(self) -> (List, List, List):
         """ Method that implements loading functionality of an on disk dataset.
 
         :param folder_path: Path to dataset folder

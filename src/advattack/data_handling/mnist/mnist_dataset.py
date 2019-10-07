@@ -35,15 +35,16 @@ class MNISTDataset(Dataset):
         for fig_index, index in enumerate(range(min_index, max_index+1)):
             ax = plt.subplot(rows, cols, fig_index+1)
             ax.set_axis_off()
-            pixels, label = self[index]
+            pixels, label_index = self[index]
+            label = self.label_map[label_index]
             plt.title(f'idx:{index}\nlbl:{label}')
             plt.imshow(pixels, cmap='gray')
         plt.show()
 
     @classmethod
     def get_config(cls):
-        # URL: (download_path, final_file_name, extraction_function)
         resources = {
+            # {resource_url: (md5_hash, destination_folder, extraction_function)}
             'http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz': (
                 "f68b3c2dcbeaaa9fbdd348bbdeb94873", "samples/", MNISTDataset.extract_samples),
             'http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz': (
@@ -92,7 +93,7 @@ class MNISTDataset(Dataset):
         with open(target_path, 'wb') as f:
             torch.save(data, f)
 
-    def load_data_from_disc(self) -> (List, List):
+    def load_data_from_disc(self) -> (List, List, List):
         """Method that implements loading functionality of an on disk dataset.
 
         :param folder_path: Path to dataset folder
@@ -107,8 +108,8 @@ class MNISTDataset(Dataset):
 
         labels = [torch.load(path) for path in labels_paths]
         labels_tensor = torch.cat(labels, 0)
-
-        return samples_tensor, labels_tensor
+        label_map = list(range(10))
+        return samples_tensor, labels_tensor, label_map
 
 
     # Helper methods to extract the data from the provided raw dataset
@@ -144,12 +145,12 @@ class MNISTDataset(Dataset):
 
 if __name__== "__main__":
     from advattack import datasets_path
+    root_path = os.path.join(datasets_path, MNISTDataset.get_dataset_identifier())
 
-    path = os.path.join(datasets_path, "mnist")
-    if not MNISTDataset.check_exists(path) or True:
-        path = MNISTDataset.create_dataset(root_path=datasets_path)
+    if not MNISTDataset.check_exists(root_path):
+        root_path = MNISTDataset.create_dataset(root_path=root_path)
 
-    dataset = MNISTDataset.load(path)
+    dataset = MNISTDataset.load(root_path)
     dataset.visualize_samples(min_index=0, max_index=5)
     len(dataset)
 

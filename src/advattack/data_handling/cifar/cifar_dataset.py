@@ -86,6 +86,7 @@ class Cifar10Dataset(Dataset):
             labels.extend(batch_labels)
         samples = np.vstack(samples).reshape(-1, 3, 32, 32)
         samples = samples.transpose((0, 2, 3, 1))  # convert to HWC
+        samples = torch.tensor(samples).float()
 
         # load labels
         label_map_path = glob.glob(os.path.join(self.root_path, "**/batches.meta"))[0]

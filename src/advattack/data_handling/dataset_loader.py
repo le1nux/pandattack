@@ -38,7 +38,7 @@ class DatasetLoader(DataLoader):
         # transform into vector
         inputs = inputs.view(inputs.shape[0], -1)
         #transform into square matrix
-        matrix_dims = int(np.sqrt(inputs.shape[1]))
+        matrix_dims = int(np.sqrt(inputs.shape[1]/channels))
         inputs = inputs.view(inputs.shape[0], channels, matrix_dims, matrix_dims)
 
         inputs_len = inputs.shape[0]

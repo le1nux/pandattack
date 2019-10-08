@@ -85,7 +85,7 @@ class Cifar10Dataset(Dataset):
             samples.append(batch_samples)
             labels.extend(batch_labels)
         samples = np.vstack(samples).reshape(-1, 3, 32, 32)
-        samples = samples.transpose((0, 2, 3, 1))  # convert to HWC
+        samples = samples.transpose((0, 2, 3, 1))  # convert from CHW to HWC format (Height Width Channel)
         samples = torch.tensor(samples).float()
 
         # load labels

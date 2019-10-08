@@ -105,6 +105,7 @@ class MNISTDataset(Dataset):
         MNISTDataset.logger.debug(f"Loading samples from {samples_paths}")
         samples = [torch.load(path) for path in samples_paths]
         samples_tensor = torch.cat(samples, 0)
+        samples_tensor = samples_tensor.unsqueeze(-1)
 
         labels = [torch.load(path) for path in labels_paths]
         labels_tensor = torch.cat(labels, 0)
@@ -142,6 +143,7 @@ class MNISTDataset(Dataset):
             torch_tensor = torch.from_numpy(parsed).view(length, num_rows, num_cols)
             torch_tensor = torch_tensor.float()
             return torch_tensor
+
 
 if __name__== "__main__":
     from advattack import datasets_path

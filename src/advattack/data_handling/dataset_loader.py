@@ -1,7 +1,6 @@
 import torch
 from torch.utils.data import DataLoader
 from advattack.data_handling.dataset import Dataset
-import numpy as np
 
 class DatasetLoader(DataLoader):
     def __init__(self, dataset: Dataset, batch_sampler=None, collate_fn=None):
@@ -31,15 +30,19 @@ class DatasetLoader(DataLoader):
         return [inputs, inputs_len, targets_tensor]
 
     @staticmethod
-    def square_matrix_collate_fn(batch, channels=1):
+    def square_matrix_collate_fn(batch):
+        """
+
+        :param batch: batch format [no_samples, height, width, channels]
+        :return:
+        """
         # batch contains a list of tuples of structure (sequence, target)
         inputs = [item[0] for item in batch]
         inputs = torch.stack(inputs)
         # transform into vector
-        inputs = inputs.view(inputs.shape[0], -1)
-        #transform into square matrix
-        matrix_dims = int(np.sqrt(inputs.shape[1]/channels))
-        inputs = inputs.view(inputs.shape[0], channels, matrix_dims, matrix_dims)
+        # inputs = inputs.view(inputs.shape[0], -1)
+        # transform into CHW matrix
+        inputs = inputs.permute(0, 3, 1, 2)
 
         inputs_len = inputs.shape[0]
         targets_tensor = torch.tensor([item[1] for item in batch]).to(inputs[0].device)

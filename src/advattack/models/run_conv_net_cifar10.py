@@ -14,8 +14,8 @@ from advattack.util.tensorboard import TensorboardMode
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print("Device: " + str(device))
 
-batch_size = 64
-learning_rate = 0.0001
+batch_size = 4
+learning_rate = 0.01
 epochs = 150
 
 dataset_class = Cifar10Dataset
@@ -44,13 +44,12 @@ model_config = \
 
 loss_function = nn.NLLLoss()
 model = model_class(**model_config).to(device)
-optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
 # generate training set
-feature_transform_fun = transforms.Compose([
-    transforms.ToTensor(),
-    transforms.Normalize((0.1307,), (0.3081,))
-])
+feature_transform_fun = transforms.Compose(
+    [transforms.ToTensor(),
+     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
 # load dataset
 dataset = DatasetRepository.get_dataset(dataset_class, feature_transform_fun=feature_transform_fun)

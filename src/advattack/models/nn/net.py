@@ -15,27 +15,37 @@ class NNModel(nn.Module):
         if seed is not None:
             torch.manual_seed(seed)
 
-    def train_model(self, train_loader: DatasetLoader, valid_loader: DatasetLoader, optimizer, loss_function, epochs=1):
+    def train_model(self, train_loader: DatasetLoader, valid_loader: DatasetLoader, optimizer, loss_function, device, epochs=1):
         print("Starting Training loss:")
-        self.evaluate_model(train_loader, 0, dataset_split_tag="train")
+        self.evaluate_model(train_loader, 0, dataset_split_tag="train", device=device)
         print("Starting Validation loss:")
-        self.evaluate_model(valid_loader, 0, dataset_split_tag="validation")
+        self.evaluate_model(valid_loader, 0, dataset_split_tag="validation", device=device)
         print("\n===============================================================================================\n")
 
         for epoch in tqdm.tqdm(range(epochs)):  # again, normally you would NOT do 300 epochs, it is toy data
-            self.train_epoch(train_loader, loss_function, optimizer)
+            self.train_epoch(train_loader, loss_function, optimizer, device)
             print("Training loss:")
-            self.evaluate_model(data_loader=train_loader, epoch=epoch, dataset_split_tag="train")
+            self.evaluate_model(data_loader=train_loader, epoch=epoch, dataset_split_tag="train", device=device)
             print("Validation loss:")
-            self.evaluate_model(data_loader=valid_loader, epoch=epoch, dataset_split_tag="validation")
+            self.evaluate_model(data_loader=valid_loader, epoch=epoch, dataset_split_tag="validation", device=device)
             print("\n============================================================================================\n")
             # model_save_path = os.path.join(f'../../models/lstm_model/epoch_{epoch}.pt')
             # model.save(model_save_path)
 
-    def evaluate_model(self, data_loader: DatasetLoader, epoch, dataset_split_tag):
+    def train_epoch(self, train_loader, loss_function, optimizer, device):
+        for samples, batch_size, targets in train_loader:
+            samples, targets = samples.to(device), targets.to(device)
+            self.zero_grad()
+            predictions = self(samples).squeeze(1)
+            loss = loss_function(predictions, targets)
+            loss.backward()
+            optimizer.step()
+
+    def evaluate_model(self, data_loader: DatasetLoader, epoch, dataset_split_tag, device):
         test_loss = 0
         correct = 0
         for samples, batch_size, targets in data_loader:
+            samples, targets = samples.to(device), targets.to(device)
             with torch.no_grad():
                 outputs = self(samples).squeeze(1)
                 test_loss += F.nll_loss(outputs, targets, reduction='sum').item()  # sum up batch loss

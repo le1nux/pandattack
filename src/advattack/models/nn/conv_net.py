@@ -46,14 +46,6 @@ class ConvNet(NNModel):
             output = F.relu(output)
         return F.log_softmax(output, dim=1)
 
-    def train_epoch(self, train_loader, loss_function, optimizer):
-        for samples, batch_size, targets in train_loader:
-            self.zero_grad()
-            predictions = self(samples).squeeze(1)
-            loss = loss_function(predictions, targets)
-            loss.backward()
-            optimizer.step()
-
     def get_config(self):
         config = super().get_config()
         config["layer_config"] = self.layer_config

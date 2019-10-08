@@ -65,7 +65,7 @@ valid_loader = DatasetLoader(dataset, batch_sampler=BatchSampler(sampler=SubsetR
                                                                  drop_last=False),
                              collate_fn=DatasetLoader.square_matrix_collate_fn)
 # train model
-model.train_model(train_loader=train_loader, valid_loader=valid_loader, optimizer=optimizer, loss_function=loss_function, epochs=epochs)
+model.train_model(train_loader=train_loader, valid_loader=valid_loader, optimizer=optimizer, loss_function=loss_function, epochs=epochs, device=device)
 
 # save model to disk
 ModelRepository.store_model(model=model, dataset_class=dataset_class)

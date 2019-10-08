@@ -14,8 +14,8 @@ from advattack.util.tensorboard import TensorboardMode
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print("Device: " + str(device))
 
-batch_size = 100
-learning_rate = 0.001
+batch_size = 64
+learning_rate = 0.0001
 epochs = 150
 
 dataset_class = Cifar10Dataset
@@ -60,12 +60,13 @@ train_loader = DatasetLoader(dataset,
                                                         batch_size=batch_size,
                                                         drop_last=False),
                              collate_fn=lambda batch: DatasetLoader.square_matrix_collate_fn(batch, channels=3))
-valid_loader = DatasetLoader(dataset, batch_sampler=BatchSampler(sampler=SubsetRandomSampler(valid_indices),
+valid_loader = DatasetLoader(dataset,
+                             batch_sampler=BatchSampler(sampler=SubsetRandomSampler(valid_indices),
                                                                  batch_size=batch_size,
                                                                  drop_last=False),
                              collate_fn=lambda batch: DatasetLoader.square_matrix_collate_fn(batch, channels=3))
 # train model
-model.train_model(train_loader=train_loader, valid_loader=valid_loader, optimizer=optimizer, loss_function=loss_function, epochs=epochs)
+model.train_model(train_loader=train_loader, valid_loader=valid_loader, optimizer=optimizer, loss_function=loss_function, epochs=epochs, device=device)
 
 # save model to disk
 ModelRepository.store_model(model=model, dataset_class=dataset_class)

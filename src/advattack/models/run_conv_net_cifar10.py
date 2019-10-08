@@ -15,7 +15,8 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print("Device: " + str(device))
 
 batch_size = 4
-learning_rate = 0.01
+learning_rate = 0.001
+momentum = 0.9
 epochs = 150
 
 dataset_class = Cifar10Dataset
@@ -30,13 +31,19 @@ model_config = \
             [
                 {
                     "type": "conv",
-                    "params": {"in_channels": 3, "out_channels": 32, "kernel_size": 3, "stride": 1}
+                    "params": {"in_channels": 3, "out_channels": 6, "kernel_size": 5, "stride": 1}
                 }, {
                     "type": "conv",
-                    "params": {"in_channels": 32, "out_channels": 64, "kernel_size": 3, "stride": 1}
-                },{
+                    "params": {"in_channels": 6, "out_channels": 16, "kernel_size": 5, "stride": 1}
+                }, {
                     "type": "fc",
-                    "params": {"in_channels": 12544, "out_channels": 10}
+                    "params": {"in_channels": 16*5*5, "out_channels": 120}
+                }, {
+                    "type": "fc",
+                    "params": {"in_channels": 120, "out_channels": 84}
+                }, {
+                    "type": "fc",
+                    "params": {"in_channels": 84, "out_channels": 10}
                 }
             ],
         "tensorboard_writer": tensorboard_writer
@@ -44,7 +51,7 @@ model_config = \
 
 loss_function = nn.NLLLoss()
 model = model_class(**model_config).to(device)
-optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum)
 
 # generate training set
 feature_transform_fun = transforms.Compose(
@@ -58,12 +65,12 @@ train_loader = DatasetLoader(dataset,
                              batch_sampler=BatchSampler(sampler=SubsetRandomSampler(train_indices),
                                                         batch_size=batch_size,
                                                         drop_last=False),
-                             collate_fn=lambda batch: DatasetLoader.square_matrix_collate_fn(batch, channels=3))
+                             collate_fn=DatasetLoader.square_matrix_collate_fn)
 valid_loader = DatasetLoader(dataset,
                              batch_sampler=BatchSampler(sampler=SubsetRandomSampler(valid_indices),
                                                                  batch_size=batch_size,
                                                                  drop_last=False),
-                             collate_fn=lambda batch: DatasetLoader.square_matrix_collate_fn(batch, channels=3))
+                             collate_fn=DatasetLoader.square_matrix_collate_fn)
 # train model
 model.train_model(train_loader=train_loader, valid_loader=valid_loader, optimizer=optimizer, loss_function=loss_function, epochs=epochs, device=device)
 

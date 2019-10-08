@@ -30,13 +30,13 @@ model_config = \
             [
                 {
                     "type": "conv",
-                    "params": {"in_channels": 1, "out_channels": 32, "kernel_size": 3, "stride": 1}
+                    "params": {"in_channels": 1, "out_channels": 32, "kernel_size": 5, "stride": 1}
                 }, {
                     "type": "conv",
                     "params": {"in_channels": 32, "out_channels": 64, "kernel_size": 3, "stride": 1}
                 },{
                     "type": "fc",
-                    "params": {"in_channels": 9216, "out_channels": 10}
+                    "params": {"in_channels": 1600, "out_channels": 10}
                 }
             ],
         "tensorboard_writer": tensorboard_writer

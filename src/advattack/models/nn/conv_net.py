@@ -36,9 +36,8 @@ class ConvNet(NNModel):
         for layer in self.conv_layers:
             output = layer(output)
             output = F.relu(output)
-            # output = F.max_pool2d(output, 2, 2)
+            output = F.max_pool2d(output, 2, 2)
         # run through fully connected layers
-        output = F.max_pool2d(output, 2, 2)
         # flatten output
         output = output.view(x.shape[0], -1)
         for layer in self.fc_layers:

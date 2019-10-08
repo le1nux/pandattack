@@ -54,9 +54,13 @@ class TestConvNet:
                                      collate_fn=DatasetLoader.square_matrix_collate_fn)
         yield train_loader, valid_loader
 
-    @pytest.fixture
-    def conv_net_model(self):
+    @pytest.fixture()
+    def device(self):
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        yield device
+
+    @pytest.fixture
+    def conv_net_model(self, device):
         print("Device: " + str(device))
 
         model_config = \
@@ -93,7 +97,7 @@ class TestConvNet:
                 break
         return weights_different
 
-    def test_train_model(self, train_valid_loader, conv_net_model):
+    def test_train_model(self, train_valid_loader, conv_net_model, device):
         # To test if training is working we store the initial model weights and
         # compare them to the ones calculated after one epoch. If they are different
         # we assume model is learning something. Fully training a model is not feasible
@@ -105,9 +109,8 @@ class TestConvNet:
         init_fc_weight_dict = self.get_weight_dict(conv_net_model.fc_layers._modules)
         init_conv_weight_dict = self.get_weight_dict(conv_net_model.conv_layers._modules)
 
-
         optimizer = torch.optim.Adam(conv_net_model.parameters(), lr=0.01)
-        conv_net_model.train_model(train_loader=train_loader, valid_loader=valid_loader, optimizer=optimizer, loss_function=loss_function, epochs=1)
+        conv_net_model.train_model(train_loader=train_loader, valid_loader=valid_loader, optimizer=optimizer, loss_function=loss_function, epochs=1, device=device)
 
         trained_fc_weight_dict = self.get_weight_dict(conv_net_model.fc_layers._modules)
         trained_conv_weight_dict = self.get_weight_dict(conv_net_model.conv_layers._modules)

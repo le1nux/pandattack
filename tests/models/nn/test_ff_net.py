@@ -47,9 +47,13 @@ class TestFFModel:
                                                                          batch_size=batch_size, drop_last=False))
         yield train_loader, valid_loader
 
-    @pytest.fixture
-    def ff_net_model(self):
+    @pytest.fixture()
+    def device(self):
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        yield device
+
+    @pytest.fixture
+    def ff_net_model(self, device):
         print("Device: " + str(device))
 
         model_config = {"layer_config": np.array([28 * 28, 250, 250, 250, 10]).flatten().tolist()}
@@ -58,7 +62,7 @@ class TestFFModel:
         model = FFNet(**model_config).to(device)
         yield model
 
-    def test_train_model(self, train_valid_loader, ff_net_model):
+    def test_train_model(self, train_valid_loader, ff_net_model, device):
         # To test if training is working we store the initial model weights and
         # compare them to the ones calculated after one epoch. If they are different
         # we assume model is learning something. Fully training a model is not feasible
@@ -73,7 +77,7 @@ class TestFFModel:
             init_weight_dict[layer_key] = initial_module_dict["0"].weight.data.clone()
 
         optimizer = torch.optim.SGD(ff_net_model.parameters(), lr=0.0008)
-        ff_net_model.train_model(train_loader=train_loader, valid_loader=valid_loader, optimizer=optimizer, loss_function=loss_function, epochs=1)
+        ff_net_model.train_model(train_loader=train_loader, valid_loader=valid_loader, optimizer=optimizer, loss_function=loss_function, epochs=1, device=device)
 
         trained_module_dict = ff_net_model.fc_layers._modules
         weights_different = True
